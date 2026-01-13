@@ -1,3 +1,21 @@
+service_account.json 
+
+
+user.gradle
+build.bat
+.gradle/
+target/
+build/
+bin/
+out/
+
+.vscode/
+
+.idea
+*.iml
+*.ipr
+*.iws
+
 # Compiled class file
 *.class
 
