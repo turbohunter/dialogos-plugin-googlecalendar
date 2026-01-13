@@ -1,38 +1,43 @@
 package app.dialogos.googlecalendar.plugin;
 
+
 import com.clt.dialogos.plugin.PluginRuntime;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
-import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.auth.http.HttpCredentialsAdapter;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.CalendarScopes;
 
+
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.Collections;
 
+
 /**
- * GoogleCalendarPluginRuntime - Initialisiert und verwaltet die Google Calendar API
- * auf Basis der Settings. Dies ist eine Singleton-ähnliche Struktur pro Plugin.
+ * GoogleCalendarPluginRuntime - Initializes and manages the Google Calendar API
+ * based on the settings. This is a singleton-like structure per plugin.
  * 
- * Verantwortlichkeiten:
- * - Authentifizierung über Service Account
- * - Bereitstellung des Calendar Service für alle Nodes
- * - Ressourcen-Management (Verbindungen, Credentials)
+ * Responsibilities:
+ * - Authentication via Service Account
+ * - Providing the Calendar Service for all Nodes
+ * - Resource Management (connections, credentials)
  */
 public class GoogleCalendarPluginRuntime implements PluginRuntime {
+
 
     private final GoogleCalendarPluginSettings settings;
     private Calendar calendarService;
     private GoogleCredentials credentials;
     private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
 
+
     public GoogleCalendarPluginRuntime(GoogleCalendarPluginSettings settings) {
         this.settings = settings;
+
 
         try {
             initialize();
@@ -41,18 +46,19 @@ public class GoogleCalendarPluginRuntime implements PluginRuntime {
         }
     }
 
+
     public void initialize() throws Exception {
         try {
             CalendarConfig config = settings.getCalendarConfig();
             
             validateConfiguration(config);
             
-            // Lade Credentials aus der Service Account Datei
+            // Load credentials from the Service Account file
             this.credentials = GoogleCredentials.fromStream(
                     new FileInputStream(config.getServiceAccountFile())
             ).createScoped(Collections.singletonList(CalendarScopes.CALENDAR));
             
-            // Erstelle den Calendar Service
+            // Create the Calendar Service
             this.calendarService = new Calendar.Builder(
                     GoogleNetHttpTransport.newTrustedTransport(),
                     JSON_FACTORY,
@@ -68,8 +74,9 @@ public class GoogleCalendarPluginRuntime implements PluginRuntime {
         }
     }
 
+
     /**
-     * Validiert die Konfiguration vor der Initialisierung.
+     * Validates the configuration before initialization.
      */
     private void validateConfiguration(CalendarConfig config) throws IllegalArgumentException {
         if (config.getServiceAccountFile() == null || config.getServiceAccountFile().isEmpty()) {
@@ -84,8 +91,8 @@ public class GoogleCalendarPluginRuntime implements PluginRuntime {
     }
     
     /**
-     * Gibt den initialisierten Calendar Service zurück.
-     * Nodes verwenden diese Methode um auf die API zuzugreifen.
+     * Returns the initialized Calendar Service.
+     * Nodes use this method to access the API.
      */
     public Calendar getCalendarService() throws Exception {
         if (this.calendarService == null) {
@@ -94,12 +101,14 @@ public class GoogleCalendarPluginRuntime implements PluginRuntime {
         return this.calendarService;
     }
 
+
     /**
-     * Gibt die gemeinsame Kalender-Konfiguration zurück.
+     * Returns the shared calendar configuration.
      */
     public CalendarConfig getCalendarConfig() {
         return settings.getCalendarConfig();
     }
+
 
     @Override
     public void dispose() {
@@ -116,8 +125,9 @@ public class GoogleCalendarPluginRuntime implements PluginRuntime {
         }
     }
 
+
     /**
-     * Gibt die Settings zurück (für Node-Zugriff).
+     * Returns the settings (for node access).
      */
     public GoogleCalendarPluginSettings getSettings() {
         return settings;

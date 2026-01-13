@@ -1,6 +1,5 @@
 package app.dialogos.googlecalendar.plugin;
 
-import com.clt.diamant.*;
 import com.clt.diamant.graph.Graph;
 import com.clt.diamant.IdMap;
 import com.clt.diamant.graph.Node;
@@ -9,28 +8,13 @@ import com.clt.diamant.gui.NodePropertiesDialog;
 import com.clt.xml.XMLReader;
 import com.clt.xml.XMLWriter;
 import org.xml.sax.SAXException;
-import com.clt.script.exp.Value;
-import com.clt.script.exp.*;
 import com.clt.diamant.WozInterface;
 import com.clt.diamant.InputCenter;
 import com.clt.diamant.ExecutionLogger;
-import com.clt.diamant.Slot;
-import com.google.api.client.util.DateTime;
 import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.model.Event;
-import com.google.api.services.calendar.model.EventDateTime;
 
-import app.dialogos.googlecalendar.plugin.CalendarConfig;
-import app.dialogos.googlecalendar.plugin.EventRequest;
-import app.dialogos.googlecalendar.plugin.EventConverter;
-
-import org.xml.sax.SAXException;
-
-import java.util.Date;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import javax.swing.*;
 import java.awt.*;
@@ -163,8 +147,7 @@ public class UpdateEventNode extends GoogleCalendarNode {
 
 
             // Store result in output variable
-            String resultAlias = getProperty(PROP_RESULT_VAR).toString();
-            setStringVariable(resultAlias, updatedEvent.getId());
+            setStringVariable(resultVariable, updatedEvent.getId());
             System.out.println("Event updated: " + updatedEvent.getId() + 
                              " (" + (summaryInput != null ? summaryInput : "unchanged") + ")");
             

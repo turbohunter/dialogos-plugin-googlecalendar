@@ -1,19 +1,19 @@
 package app.dialogos.googlecalendar.plugin;
 
+
 import com.clt.dialogos.plugin.PluginSettings;
-import com.clt.dialogos.plugin.Plugin;
 import com.clt.diamant.graph.Node;
 
+
 import com.clt.gui.Images;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Arrays;
 import javax.swing.Icon;
 
+
 /**
- * Google Calendar Plugin für DialogOS
+ * Google Calendar Plugin for DialogOS
  * 
- * Registriert alle Calendar Nodes beim DialogOS-System
+ * Registers all Calendar Nodes with the DialogOS system
  */
 public class GoogleCalendarPlugin implements com.clt.dialogos.plugin.Plugin {
     
@@ -39,15 +39,16 @@ public class GoogleCalendarPlugin implements com.clt.dialogos.plugin.Plugin {
     
     @Override
     public void initialize() {
-        // hier werden die Nodes registriert
+        // here the nodes are registered
         Node.registerNodeTypes(
-            this.getName(),  // Gruppen-Name im UI
+            this.getName(),  // group name in the UI
             Arrays.asList(CreateEventNode.class, 
                 UpdateEventNode.class, 
                 ListEventsNode.class, 
                 DeleteEventNode.class)
         );
     }
+
 
     @Override
     public PluginSettings createDefaultSettings() {

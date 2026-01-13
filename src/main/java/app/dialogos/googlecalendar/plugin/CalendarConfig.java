@@ -1,14 +1,15 @@
 package app.dialogos.googlecalendar.plugin;
 
+
 /**
- * CalendarConfig - Immutable Konfigurationsklasse für Google Calendar.
+ * CalendarConfig - Immutable configuration class for Google Calendar.
  * 
- * Diese Klasse enthält alle globalen Einstellungen, die von allen Nodes gemeinsam
- * genutzt werden. Sie ist immutable (unveränderbar) für Thread-Safety.
+ * This class contains all global settings that are shared by all nodes.
+ * It is immutable for thread-safety.
  * 
- * Verwendung:
- * - Wird von GoogleCalendarPluginRuntime verwendet um die API zu initialisieren
- * - Wird von allen Calendar Nodes verwendet um auf Konfiguration zuzugreifen
+ * Usage:
+ * - Used by GoogleCalendarPluginRuntime to initialize the API
+ * - Used by all Calendar Nodes to access configuration
  */
 public final class CalendarConfig {
     
@@ -17,11 +18,11 @@ public final class CalendarConfig {
     private final String applicationName;
     
     /**
-     * Erstellt eine neue Kalender-Konfiguration.
+     * Creates a new calendar configuration.
      * 
-     * @param serviceAccountFile Absoluter Pfad zur Google Service Account JSON Datei
+     * @param serviceAccountFile Absolute path to the Google Service Account JSON file
      * @param calendarId Google Calendar ID
-     * @param applicationName Name der Anwendung für Google API Requests
+     * @param applicationName Name of the application for Google API requests
      */
     public CalendarConfig(String serviceAccountFile, String calendarId, String applicationName) {
         this.serviceAccountFile = serviceAccountFile;
@@ -30,28 +31,28 @@ public final class CalendarConfig {
     }
     
     /**
-     * Gibt den Pfad zur Service Account Datei zurück.
+     * Returns the path to the service account file.
      */
     public String getServiceAccountFile() {
         return serviceAccountFile;
     }
     
     /**
-     * Gibt die Calendar ID zurück.
+     * Returns the calendar ID.
      */
     public String getCalendarId() {
         return calendarId;
     }
     
     /**
-     * Gibt den Namen der Anwendung zurück.
+     * Returns the application name.
      */
     public String getApplicationName() {
         return applicationName;
     }
     
     /**
-     * Prüft ob die Konfiguration vollständig und valide ist.
+     * Checks whether the configuration is complete and valid.
      */
     public boolean isValid() {
         return serviceAccountFile != null && !serviceAccountFile.isEmpty()

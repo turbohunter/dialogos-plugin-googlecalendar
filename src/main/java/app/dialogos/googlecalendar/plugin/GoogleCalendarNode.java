@@ -1,11 +1,10 @@
 package app.dialogos.googlecalendar.plugin;
 
-import com.clt.diamant.*;
+
 import com.clt.diamant.graph.Graph;
 import com.clt.diamant.IdMap;
 import com.clt.diamant.graph.Node;
 import com.clt.diamant.graph.nodes.NodeExecutionException;
-import com.clt.diamant.gui.NodePropertiesDialog;
 import com.clt.xml.XMLReader;
 import com.clt.xml.XMLWriter;
 import org.xml.sax.SAXException;
@@ -13,50 +12,39 @@ import com.clt.diamant.WozInterface;
 import com.clt.diamant.InputCenter;
 import com.clt.diamant.ExecutionLogger;
 import com.clt.diamant.Slot;
-import com.google.api.client.util.DateTime;
 import com.clt.script.exp.*;
-import com.clt.diamant.Slot;
-import com.google.api.services.calendar.Calendar;
 import com.clt.dialogos.plugin.PluginRuntime;
-import com.google.api.services.calendar.model.Event;
-import com.google.api.services.calendar.model.EventDateTime;
 
-import app.dialogos.googlecalendar.plugin.CalendarConfig;
-import app.dialogos.googlecalendar.plugin.GoogleCalendarPluginRuntime;
-
-import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
 import javax.swing.*;
 import java.awt.*;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.Collection;
-import java.util.Arrays;
-import java.util.Date;
 import java.util.ArrayList;
 import java.util.List;
 
+
 /**
- * GoogleCalendarNode - ABSTRAKTE BASE-KLASSE für alle Google Calendar Operationen.
+ * GoogleCalendarNode - ABSTRACT BASE CLASS for all Google Calendar operations.
  * 
- * WICHTIG: Diese Klasse ist NICHT dazu bestimmt direkt verwendet zu werden!
- * Sie ist eine abstrakte Basis-Klasse für konkrete Nodes wie:
+ * IMPORTANT: This class is NOT intended to be used directly!
+ * It is an abstract base class for concrete nodes like:
  * ├─ CreateEventNode
  * ├─ UpdateEventNode
  * ├─ ListEventsNode
  * └─ DeleteEventNode
  * 
- * Ein Dialog OS Nutzer wird diese Klasse NICHT direkt sehen können.
+ * A Dialog OS user will NOT be able to see this class directly.
 **/
 public abstract class GoogleCalendarNode extends Node {
 
+
     public GoogleCalendarNode() {
         super();
-        this.addEdge();  // Standard Success-Kante
+        this.addEdge();  // Standard success edge
     }
+
 
 
     @Override
@@ -64,8 +52,9 @@ public abstract class GoogleCalendarNode extends Node {
             throws NodeExecutionException;
 
 
+
     /**
-     * Ruft die gemeinsame PluginRuntime ab.
+     * Retrieves the shared PluginRuntime.
      */
     protected GoogleCalendarPluginRuntime getPluginRuntime(WozInterface comm) 
         throws NodeExecutionException {
@@ -83,8 +72,9 @@ public abstract class GoogleCalendarNode extends Node {
         }
     }
 
+
     /**
-     * Ruft die Kalender-Konfiguration ab (Global Settings).
+     * Retrieves the calendar configuration (Global Settings).
      */
     protected CalendarConfig getCalendarConfig(WozInterface comm) throws NodeExecutionException {
         try {
@@ -97,8 +87,9 @@ public abstract class GoogleCalendarNode extends Node {
         }
     }
 
+
     /**
-     * Ruft den authentifizierten Calendar Service ab.
+     * Retrieves the authenticated Calendar Service.
      */
     protected com.google.api.services.calendar.Calendar getCalendarService(WozInterface comm) 
             throws NodeExecutionException {
@@ -112,11 +103,12 @@ public abstract class GoogleCalendarNode extends Node {
         }
     }
 
+
     @Override
     protected void writeAttributes(XMLWriter out, IdMap uid_map) {
         super.writeAttributes(out, uid_map);
-        // Base-Klasse hat keine zusätzlichen Properties zu speichern
-        // Konkrete Nodes überschreiben und speichern ihre Properties
+        // Base class has no additional properties to save
+        // Concrete nodes override and save their properties
     }
     
     protected void writeAttributeIfNotEmpty(XMLWriter out, String name, String value) {
@@ -125,31 +117,36 @@ public abstract class GoogleCalendarNode extends Node {
         }
     }
 
+
     @Override
     protected void readAttribute(XMLReader r, String name, String value, IdMap uid_map) 
             throws SAXException {
         super.readAttribute(r, name, value, uid_map);
-        // Base-Klasse hat keine zusätzlichen Properties zu laden
-        // Konkrete Nodes überschreiben und laden ihre Properties
+        // Base class has no additional properties to load
+        // Concrete nodes override and load their properties
     }
+
 
     @Override
     public JComponent createEditorComponent(Map<String, Object> properties) {
         JPanel panel = new JPanel(new BorderLayout(5, 5));
         panel.add(new JLabel("Google Calendar Node"), BorderLayout.WEST);
         
-        // Konkrete Nodes sollten diese Methode überschreiben
+        // Concrete nodes should override this method
         return panel;
     }
 
+
     public static Color getDefaultColor() {
-        return new Color(100, 150, 200);  // Blau für Google Calendar
+        return new Color(100, 150, 200);  // Blue for Google Calendar
     }
+
 
     @Override
     public void writeVoiceXML(XMLWriter out, IdMap uid_map) {
-        // Nicht relevant für Google Calendar
+        // Not relevant for Google Calendar
     }
+
 
     protected void setStringVariable(String variableName, String value) 
         throws NodeExecutionException {
@@ -164,11 +161,11 @@ public abstract class GoogleCalendarNode extends Node {
     }
     
     /**
-     * Ersetzt ${variableName} mit echtem Wert aus Graph 
-     * @param input Input-String (kann ${var} oder direkt Wert sein)
-     * @param logger Für Logging (optional)
-     * @return Wert mit ersetzten Variablen
-     * @throws NodeExecutionException wenn Variable nicht existiert
+     * Replaces ${variableName} with actual value from Graph 
+     * @param input Input string (can be ${var} or direct value)
+     * @param logger For logging (optional)
+     * @return Value with replaced variables
+     * @throws NodeExecutionException if variable does not exist
      */
     protected String evaluateVariable(String input, ExecutionLogger logger, WozInterface comm) 
             throws NodeExecutionException {
@@ -176,22 +173,26 @@ public abstract class GoogleCalendarNode extends Node {
             return input;
         }
 
+
         // Pattern: ${variableName}
         String pattern = "\\$\\{([^}]+)\\}";
         java.util.regex.Pattern p = java.util.regex.Pattern.compile(pattern);
         java.util.regex.Matcher m = p.matcher(input);
 
+
         StringBuffer result = new StringBuffer();
         boolean found = false;
 
+
         while (m.find()) {
             found = true;
-            String variableName = m.group(1);  // z.B. "eventTitle" aus "${eventTitle}"
+            String variableName = m.group(1);  // e.g. "eventTitle" from "${eventTitle}"
+
 
             try {
                 Graph graph = this.getGraph();
                 List<Slot> variables = graph.getVariables();
-                // Suche die Variable mit dem passenden Namen
+                // Search for the variable with matching name
                 Slot targetSlot = null;
                 for (Slot slot : variables) {
                     if (slot.getName().equals(variableName)) {
@@ -202,7 +203,7 @@ public abstract class GoogleCalendarNode extends Node {
                 if (targetSlot == null) {
                     m.appendReplacement(result, "");
                 } else {
-                    // Hole den Wert der Variable
+                    // Get the value of the variable
                     Value value = targetSlot.getValue();
                     if (value == null) {
                         m.appendReplacement(result, "");
@@ -211,6 +212,7 @@ public abstract class GoogleCalendarNode extends Node {
                         m.appendReplacement(result, java.util.regex.Matcher.quoteReplacement(stringValue));
                     }
                 }
+
 
             } catch (NodeExecutionException e) {
                 throw e;
@@ -221,26 +223,28 @@ public abstract class GoogleCalendarNode extends Node {
             }
         }
 
+
         m.appendTail(result);
         
-        // Wenn keine Variable gefunden: Input bleibt wie ist
+        // If no variable found: input remains as is
         return found ? result.toString() : input;
     }
 
+
     /**
-     * Parst einen DateTime-String im ISO 8601 Format.
+     * Parses a DateTime string in ISO 8601 format.
      * 
-     * @param dateTimeStr String im Format "2025-01-15T10:00:00"
-     * @param fieldName Name des Feldes für Error-Messages
+     * @param dateTimeStr String in format "2025-01-15T10:00:00"
+     * @param fieldName Name of the field for error messages
      * @return LocalDateTime
-     * @throws NodeExecutionException bei Parse-Fehler
+     * @throws NodeExecutionException on parse error
      */
     protected LocalDateTime parseDateTime(String dateTimeStr, String fieldName) 
             throws NodeExecutionException {
         if (dateTimeStr == null || dateTimeStr.isEmpty()) {
             throw new NodeExecutionException(this, fieldName + " ist erforderlich");
         }
-        // Entfernt Anführungszeichen (doppelt und einfach) vorne und hinten
+        // Remove quotes (double and single) at start and end
         dateTimeStr = dateTimeStr.replaceAll("^[\"']+|[\"']+$", "");
         try {
             return LocalDateTime.parse(dateTimeStr);
@@ -251,20 +255,22 @@ public abstract class GoogleCalendarNode extends Node {
         }
     }
 
+
     /**
-     * Parst Reminder-String und fügt sie zum Builder hinzu.
+     * Parses reminder string and adds them to the builder.
      * 
      * Format: "method:minutes,method:minutes,..."
-     * Beispiel: "email:15,popup:30" → Email-Erinnerung 15min vor, Popup 30min vor
+     * Example: "email:15,popup:30" → Email reminder 15min before, popup 30min before
      * 
      * @param builder EventRequest Builder
-     * @param remindersStr Reminder-String
-     * @throws NodeExecutionException bei Parse-Fehler
+     * @param remindersStr Reminder string
+     * @throws NodeExecutionException on parse error
      */
     protected void parseAndAddReminders(EventRequest.Builder builder, String remindersStr)
             throws NodeExecutionException {
         try {
             String[] reminderPairs = remindersStr.split(",");
+
 
             for (String pair : reminderPairs) {
                 String[] parts = pair.trim().split(":");
@@ -274,15 +280,18 @@ public abstract class GoogleCalendarNode extends Node {
                             "'. Verwende 'method:minutes' (z.B. 'email:15')");
                 }
 
+
                 String method = parts[0].trim();
                 int minutes = Integer.parseInt(parts[1].trim());
 
-                // Validiere Methode
+
+                // Validate method
                 if (!method.equals("email") && !method.equals("popup") && !method.equals("sms")) {
                     throw new IllegalArgumentException(
                             "Reminder-Methode '" + method + 
                             "' ungültig. Verwende: email, popup oder sms");
                 }
+
 
                 builder.addReminder(method, minutes);
             }
@@ -293,6 +302,7 @@ public abstract class GoogleCalendarNode extends Node {
             throw new NodeExecutionException(this, e.getMessage());
         }
     }
+
 
     // Helper method to get variable list
     protected String[] getListVariables() {

@@ -1,34 +1,31 @@
 package app.dialogos.googlecalendar.plugin;
 
-import com.clt.diamant.*;
+
 import com.clt.dialogos.plugin.PluginRuntime;
 import com.clt.dialogos.plugin.PluginSettings;
-import com.clt.dialogos.plugin.Plugin;
-import com.clt.diamant.graph.Node;
 import com.clt.diamant.IdMap;
 import com.clt.diamant.graph.Graph;
-import com.clt.diamant.graph.nodes.NodeExecutionException;
-import com.clt.diamant.gui.NodePropertiesDialog;
-import com.google.auth.http.HttpCredentialsAdapter;
 import com.clt.properties.*;
 import com.clt.xml.XMLReader;
 import com.clt.xml.XMLWriter;
 
+
 import org.xml.sax.SAXException;
+
 
 import java.awt.*;
 import java.io.File;
-import java.util.*;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+
 /**
- * GoogleCalendarPluginSettings - Verwaltet globale Einstellungen für alle Google Calendar Nodes.
- * Diese Klasse speichert die gemeinsamen Konfigurationswerte, die über alle Nodes hinweg gelten.
+ * GoogleCalendarPluginSettings - Manages global settings for all Google Calendar Nodes.
+ * This class stores the shared configuration values that apply across all nodes.
  * 
- * Struktur:
+ * Structure:
  * - Global Settings (PluginSettings): serviceAccountFile, calendarId, applicationName
- * - Pro-Node Settings: werden in den einzelnen Node-Klassen verwaltet
+ * - Per-Node Settings: managed in individual node classes
  */
 public class GoogleCalendarPluginSettings extends PluginSettings {
     
@@ -46,6 +43,7 @@ public class GoogleCalendarPluginSettings extends PluginSettings {
         }
     };
 
+
     static final String DEFAULT_CALENDAR_ID = "";
     StringProperty calendarIdProperty = new DefaultStringProperty(
             "CALENDAR_ID", null, null,
@@ -59,6 +57,7 @@ public class GoogleCalendarPluginSettings extends PluginSettings {
             return "Google Calendar ID";
         }
     };
+
 
     static final String DEFAULT_APPLICATION_NAME = "";
     StringProperty applicationNameProperty = new DefaultStringProperty(
@@ -75,8 +74,8 @@ public class GoogleCalendarPluginSettings extends PluginSettings {
     };
     
     /**
-     * Gibt die globale Kalender-Konfiguration zurück.
-     * Diese wird von allen Nodes verwendet.
+     * Returns the global calendar configuration.
+     * This is used by all nodes.
      */
     public CalendarConfig getCalendarConfig() {
         return new CalendarConfig(
@@ -86,30 +85,37 @@ public class GoogleCalendarPluginSettings extends PluginSettings {
         );
     }
 
+
     public String getServiceAccountFile() {
         return serviceAccountFileProperty.getValue();
     }
+
 
     public String getCalendarId() {
         return calendarIdProperty.getValue();
     }
 
+
     public String getApplicationName() {
         return applicationNameProperty.getValue();
     }
 
-    // Setter für externe Konfiguration
+
+    // Setters for external configuration
     public void setServiceAccountFile(String path) {
         this.serviceAccountFileProperty.setValue(path);
     }
+
 
     public void setCalendarId(String calendarId) {
         this.calendarIdProperty.setValue(calendarId);
     }
 
+
     public void setApplicationName(String appName) {
         this.applicationNameProperty.setValue(appName);
     }
+
 
     @Override
     public void writeAttributes(XMLWriter xmlWriter, IdMap idMap) {
@@ -120,6 +126,7 @@ public class GoogleCalendarPluginSettings extends PluginSettings {
         if (!applicationNameProperty.getValue().equals(DEFAULT_APPLICATION_NAME))
             Graph.printAtt(xmlWriter, applicationNameProperty.getID(), applicationNameProperty.getValue());
     }
+
 
    @Override
     protected void readAttribute(XMLReader xmlReader, String name, String value, IdMap idMap) throws SAXException {
@@ -132,17 +139,20 @@ public class GoogleCalendarPluginSettings extends PluginSettings {
         }
     }
 
+
     @Override
     protected PluginRuntime createRuntime(Component component) {
         return new GoogleCalendarPluginRuntime(this);
     }
+
 
     @Override
     public JComponent createEditor() {
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
 
-        // Panel für die Settings
+
+        // Panel for settings
         JPanel settingsPanel = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(5, 5, 5, 5);
@@ -150,11 +160,13 @@ public class GoogleCalendarPluginSettings extends PluginSettings {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.weightx = 1.0;
 
-        // Service Account File mit Dateiauswahl
+
+        // Service Account File with file selection
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.weightx = 0;
         settingsPanel.add(new JLabel("Service Account File:"), gbc);
+
 
         gbc.gridx = 1;
         gbc.weightx = 1.0;
@@ -162,6 +174,7 @@ public class GoogleCalendarPluginSettings extends PluginSettings {
         JTextField fileField = new JTextField(getServiceAccountFile(), 30);
         fileField.setEditable(false);
         filePanel.add(fileField, BorderLayout.CENTER);
+
 
         JButton browseButton = new JButton("Browse...");
         browseButton.addActionListener(e -> {
@@ -177,11 +190,13 @@ public class GoogleCalendarPluginSettings extends PluginSettings {
         filePanel.add(browseButton, BorderLayout.EAST);
         settingsPanel.add(filePanel, gbc);
 
+
         // Calendar ID
         gbc.gridx = 0;
         gbc.gridy = 1;
         gbc.weightx = 0;
         settingsPanel.add(new JLabel("Calendar ID:"), gbc);
+
 
         gbc.gridx = 1;
         gbc.weightx = 1.0;
@@ -196,11 +211,13 @@ public class GoogleCalendarPluginSettings extends PluginSettings {
         });
         settingsPanel.add(calendarIdField, gbc);
 
+
         // Application Name
         gbc.gridx = 0;
         gbc.gridy = 2;
         gbc.weightx = 0;
         settingsPanel.add(new JLabel("Application Name:"), gbc);
+
 
         gbc.gridx = 1;
         gbc.weightx = 1.0;
@@ -215,8 +232,10 @@ public class GoogleCalendarPluginSettings extends PluginSettings {
         });
         settingsPanel.add(appNameField, gbc);
 
+
         mainPanel.add(settingsPanel);
         mainPanel.add(Box.createVerticalGlue());
+
 
         // make sure values are set after components are created
         SwingUtilities.invokeLater(() -> {
@@ -224,7 +243,7 @@ public class GoogleCalendarPluginSettings extends PluginSettings {
             calendarIdField.setText(getCalendarId() != null ? getCalendarId() : "");
             appNameField.setText(getApplicationName() != null ? getApplicationName() : "");
         });
-        // Panel mit Scroll-Support
+        // Panel with scroll support
         JScrollPane scrollPane = new JScrollPane(mainPanel);
         return scrollPane;
     }

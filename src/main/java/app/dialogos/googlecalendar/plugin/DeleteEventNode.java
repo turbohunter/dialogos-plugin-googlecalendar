@@ -1,6 +1,5 @@
 package app.dialogos.googlecalendar.plugin;
 
-import com.clt.diamant.*;
 import com.clt.diamant.graph.Graph;
 import com.clt.diamant.IdMap;
 import com.clt.diamant.graph.Node;
@@ -9,14 +8,10 @@ import com.clt.diamant.gui.NodePropertiesDialog;
 import com.clt.xml.XMLReader;
 import com.clt.xml.XMLWriter;
 import org.xml.sax.SAXException;
-import com.clt.script.exp.Value;
-import com.clt.script.exp.*;
 import com.clt.diamant.WozInterface;
 import com.clt.diamant.InputCenter;
 import com.clt.diamant.ExecutionLogger;
 import com.google.api.services.calendar.Calendar;
-
-import app.dialogos.googlecalendar.plugin.CalendarConfig;
 
 import java.util.Map;
 import javax.swing.*;
@@ -190,11 +185,6 @@ public class DeleteEventNode extends GoogleCalendarNode {
         mainPanel.add(new JScrollPane(inputPanel), BorderLayout.CENTER);
         return mainPanel;
     }
-
-    // @Override
-    // public Icon getIcon() {
-    //     return Images.load(this, "delete_event.png");
-    // }
 
     @Override
     public void writeVoiceXML(XMLWriter out, IdMap uid_map) {

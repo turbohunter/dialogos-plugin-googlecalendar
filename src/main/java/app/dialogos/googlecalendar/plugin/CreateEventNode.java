@@ -1,6 +1,6 @@
 package app.dialogos.googlecalendar.plugin;
 
-import com.clt.diamant.*;
+
 import com.clt.diamant.graph.Graph;
 import com.clt.diamant.IdMap;
 import com.clt.diamant.graph.Node;
@@ -9,46 +9,34 @@ import com.clt.diamant.gui.NodePropertiesDialog;
 import com.clt.xml.XMLReader;
 import com.clt.xml.XMLWriter;
 import org.xml.sax.SAXException;
-import com.clt.script.exp.Value;
-import com.clt.script.exp.*;
 import com.clt.diamant.WozInterface;
 import com.clt.diamant.InputCenter;
 import com.clt.diamant.ExecutionLogger;
-import com.clt.diamant.Slot;
-import com.google.api.client.util.DateTime;
 import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.model.Event;
-import com.google.api.services.calendar.model.EventDateTime;
 
-import app.dialogos.googlecalendar.plugin.CalendarConfig;
-import app.dialogos.googlecalendar.plugin.EventRequest;
-import app.dialogos.googlecalendar.plugin.EventConverter;
 
-import org.xml.sax.SAXException;
-
-import java.util.Date;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import javax.swing.*;
 import java.awt.*;
 
+
 /**
- * CreateEventNode - Node zur Erstellung von Google Calendar Events.
+ * CreateEventNode - Node for creating Google Calendar Events.
  * 
- * Beispiel für Node-spezifische Properties:
- * - eventTitle (Eingabe vom Dialog)
- * - eventDescription (Eingabe vom Dialog)
- * - startTime (Eingabe vom Dialog)
- * - endTime (Eingabe vom Dialog)
- * - result (Ausgabe: Event ID oder Fehler)
+ * Example of node-specific properties:
+ * - eventTitle (input from dialog)
+ * - eventDescription (input from dialog)
+ * - startTime (input from dialog)
+ * - endTime (input from dialog)
+ * - result (output: Event ID or error)
  * 
- * Die globalen Settings (serviceAccountFile, calendarId, etc.) 
- * kommen aus GoogleCalendarPluginSettings!
+ * The global settings (serviceAccountFile, calendarId, etc.) 
+ * come from GoogleCalendarPluginSettings!
  */
 public class CreateEventNode extends GoogleCalendarNode {
+
 
     private static final String PROP_SUMMARY = "summary";
     private static final String PROP_DESCRIPTION = "description";
@@ -57,6 +45,7 @@ public class CreateEventNode extends GoogleCalendarNode {
     private static final String PROP_END_TIME = "endTime";
     private static final String PROP_REMINDERS = "reminders";
     private static final String PROP_RESULT_VAR = "resultVariable";
+
 
     public CreateEventNode() {
         super();
@@ -69,11 +58,12 @@ public class CreateEventNode extends GoogleCalendarNode {
         this.setProperty(PROP_RESULT_VAR, "eventId");
     }
 
+
     @Override
     public Node execute(WozInterface comm, InputCenter input, ExecutionLogger logger) 
             throws NodeExecutionException {
         try {
-            // Hole die Property-Werte und evaluiere Variablen
+            // Get property values and evaluate variables
             String summaryInput = evaluateVariable(
                 getProperty(PROP_SUMMARY).toString(), logger, comm);
             String descriptionInput = evaluateVariable(
@@ -99,17 +89,20 @@ public class CreateEventNode extends GoogleCalendarNode {
                 throw new NodeExecutionException(this, "End Time ist erforderlich");
             }
 
-            // 2. Parse und validiere die Input-Parameter
+
+            // Parse and validate input parameters
             LocalDateTime startTime = parseDateTime(startTimeInput, "Start Time");
             LocalDateTime endTime = parseDateTime(endTimeInput, "End Time");
 
-            // 3. Konstruiere EventRequest mit Builder Pattern
+
+            // Construct EventRequest with Builder Pattern
             EventRequest.Builder eventBuilder = EventRequest.builder()
                     .summary(summaryInput)
                     .startTime(startTime)
                     .endTime(endTime);
 
-            // Optionale Felder nur wenn vorhanden
+
+            // Optional fields only if present
             if (descriptionInput != null && !descriptionInput.isEmpty()) {
                 eventBuilder.description(descriptionInput);
             }
@@ -127,17 +120,16 @@ public class CreateEventNode extends GoogleCalendarNode {
             CalendarConfig config = getCalendarConfig(comm);
             Calendar service = getCalendarService(comm);
 
-            // Erstelle das Event in Google Calendar
+
+            // Create the event in Google Calendar
             Event createdEvent = service.events().insert(
                     config.getCalendarId(),
                     event
             ).execute();
 
-            // 6. Speichere Ergebnis in Output-Variable
-            
-            // variable chosen from exisiting ones in graph
-            String resultAlias = getProperty(PROP_RESULT_VAR).toString();
-            setStringVariable(resultAlias, createdEvent.getId());
+
+            // Save result in output variable
+            setStringVariable(resultVariable, createdEvent.getId());
             System.out.println("Event erstellt: " + createdEvent.getId() + 
                              " (" + eventRequest.getSummary() + ")");
             
@@ -165,6 +157,7 @@ public class CreateEventNode extends GoogleCalendarNode {
         Graph.printAtt(out, PROP_RESULT_VAR, this.getProperty(PROP_RESULT_VAR).toString());
     }
 
+
     @Override
     protected void readAttribute(XMLReader r, String name, String value, IdMap uid_map) 
             throws SAXException {
@@ -188,13 +181,16 @@ public class CreateEventNode extends GoogleCalendarNode {
         
     }    
 
+
     @Override
     public JComponent createEditorComponent(Map<String, Object> properties) {
         JPanel mainPanel = new JPanel(new BorderLayout(5, 5));
         mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
+
         JPanel inputPanel = new JPanel();
         inputPanel.setLayout(new BoxLayout(inputPanel, BoxLayout.Y_AXIS));
+
 
         // Info Panel
         JTextArea infoArea = new JTextArea(
@@ -202,7 +198,7 @@ public class CreateEventNode extends GoogleCalendarNode {
                 "${eventTitle} - value of variable 'eventTitle'\n" +
                 "or direct value\n" +
                 "DateTime Format: 2026-01-15T10:00:00" +  "\n" + 
-                "result variable can be chosen from exisiting variables"
+                "result variable can be chosen from existing variables"
         );
         infoArea.setEditable(false);
         infoArea.setLineWrap(true);
@@ -210,7 +206,8 @@ public class CreateEventNode extends GoogleCalendarNode {
         infoArea.setBackground(new Color(240, 240, 240));
         inputPanel.add(new JScrollPane(infoArea));
 
-        // Stelle sicher, dass alle Properties als String existieren
+
+        // Ensure all properties exist as String
         properties.putIfAbsent(PROP_SUMMARY, this.getProperty(PROP_SUMMARY));
         properties.putIfAbsent(PROP_DESCRIPTION, this.getProperty(PROP_DESCRIPTION));
         properties.putIfAbsent(PROP_LOCATION, this.getProperty(PROP_LOCATION));
@@ -218,6 +215,7 @@ public class CreateEventNode extends GoogleCalendarNode {
         properties.putIfAbsent(PROP_END_TIME, this.getProperty(PROP_END_TIME));
         properties.putIfAbsent(PROP_REMINDERS, this.getProperty(PROP_REMINDERS));
         properties.putIfAbsent(PROP_RESULT_VAR, this.getProperty(PROP_RESULT_VAR));
+
 
         // Summary
         JPanel summaryRow = new JPanel();
@@ -229,6 +227,7 @@ public class CreateEventNode extends GoogleCalendarNode {
         summaryRow.add(summaryField);
         inputPanel.add(summaryRow);
 
+
         // Description
         JPanel descRow = new JPanel();
         descRow.add(new JLabel("Description:"));
@@ -237,6 +236,7 @@ public class CreateEventNode extends GoogleCalendarNode {
         descRow.add(descField);
         inputPanel.add(descRow);
 
+
         // Location
         JPanel locRow = new JPanel();
         locRow.add(new JLabel("Location:"));
@@ -244,6 +244,7 @@ public class CreateEventNode extends GoogleCalendarNode {
         locField.setToolTipText("z.B. '${eventLocation}'");
         locRow.add(locField);
         inputPanel.add(locRow);
+
 
         // Start Time
         JPanel startRow = new JPanel();
@@ -255,6 +256,7 @@ public class CreateEventNode extends GoogleCalendarNode {
         startRow.add(startField);
         inputPanel.add(startRow);
 
+
         // End Time
         JPanel endRow = new JPanel();
         JLabel endLabel = new JLabel("End Time (REQUIRED):");
@@ -265,6 +267,7 @@ public class CreateEventNode extends GoogleCalendarNode {
         endRow.add(endField);
         inputPanel.add(endRow);
 
+
         // Reminders
         JPanel remindersRow = new JPanel();
         remindersRow.add(new JLabel("Reminders:"));
@@ -273,7 +276,8 @@ public class CreateEventNode extends GoogleCalendarNode {
         remindersRow.add(remindersField);
         inputPanel.add(remindersRow);
 
-        // Result Variable - als ComboBox wie im ROS Node
+
+        // Result Variable - as ComboBox like in ROS Node
         JPanel resultRow = new JPanel();
         resultRow.add(new JLabel("Result Variable:"));
         JComboBox<?> resultCombo = NodePropertiesDialog.createComboBox(
@@ -285,9 +289,11 @@ public class CreateEventNode extends GoogleCalendarNode {
         resultRow.add(resultCombo);
         inputPanel.add(resultRow);
 
+
         mainPanel.add(new JScrollPane(inputPanel), BorderLayout.CENTER);
         return mainPanel;
     }
+
 
     @Override
     public void writeVoiceXML(XMLWriter out, IdMap uid_map) {
