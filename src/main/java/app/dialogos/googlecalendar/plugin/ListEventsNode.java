@@ -330,7 +330,7 @@ public class ListEventsNode extends GoogleCalendarNode {
         try {
             return mapper.writeValueAsString(response);
         } catch (Exception e) {
-            System.out.println("JSON serialization failed" + e + "using fallback");
+            System.out.println("JSON serialization failed: " + e + " using fallback");
             return formatEventsList(events); // Fallback
         }
     }
