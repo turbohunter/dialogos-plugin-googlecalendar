@@ -56,6 +56,9 @@ dependencies {
     testImplementation 'org.mockito:mockito-core:5.14.1'
     testImplementation 'org.mockito:mockito-junit-jupiter:5.14.1'
 
+    // Groovy
+    implementation 'org.apache.groovy:groovy-all:4.0.23'
+
     // Logging
     implementation 'org.slf4j:slf4j-api:1.7.24'
     
