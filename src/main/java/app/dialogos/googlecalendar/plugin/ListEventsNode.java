@@ -310,15 +310,15 @@ public class ListEventsNode extends GoogleCalendarNode {
             Event event = events.get(i);
             Map<String, Object> eventMap = new HashMap<>();
             
-            LocalDateTime start_time = parseJsonToLocalDateTime(event.getStart().toString());
-            LocalDateTime end_time = parseJsonToLocalDateTime(event.getEnd().toString());
+            LocalDateTime startTime = parseJsonToLocalDateTime(event.getStart().toString());
+            LocalDateTime endTime = parseJsonToLocalDateTime(event.getEnd().toString());
 
             eventMap.put("index", i + 1);
             eventMap.put("id", event.getId());
             eventMap.put("summary", event.getSummary() != null ? event.getSummary() : "(No title)");
-            eventMap.put("start", start_time);
-            eventMap.put("end", end_time);
-            eventMap.put("duration_minutes", calculateDuration(start_time, end_time));
+            eventMap.put("start", startTime);
+            eventMap.put("end", endTime);
+            eventMap.put("duration_minutes", calculateDuration(startTime, endTime));
             eventMap.put("location", event.getLocation());
             eventMap.put("description", event.getDescription());
             
