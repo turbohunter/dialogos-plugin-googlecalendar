@@ -7,6 +7,9 @@ import com.clt.diamant.graph.Node;
 import com.clt.diamant.graph.nodes.NodeExecutionException;
 import com.clt.xml.XMLReader;
 import com.clt.xml.XMLWriter;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 import org.xml.sax.SAXException;
 import com.clt.diamant.WozInterface;
 import com.clt.diamant.InputCenter;
@@ -17,6 +20,8 @@ import com.clt.dialogos.plugin.PluginRuntime;
 
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import javax.swing.*;
 import java.awt.*;
@@ -254,6 +259,26 @@ public abstract class GoogleCalendarNode extends Node {
                     "Eingabe war: " + dateTimeStr);
         }
     }
+
+    /**
+     * Parses a JSON string containing dateTime and timeZone fields
+     * and converts it to a LocalDateTime object.
+     * 
+     * @param jsonString JSON string with format: {"dateTime":"2026-01-15T10:00:00.000+01:00","timeZone":"UTC"}
+     * @return LocalDateTime representation of the dateTime field
+     */
+    public LocalDateTime parseJsonToLocalDateTime(String jsonString) {
+        // Parse JSON string to extract the dateTime value
+        JsonObject jsonObject = JsonParser.parseString(jsonString).getAsJsonObject();
+        String dateTimeString = jsonObject.get("dateTime").getAsString();
+        
+        // Parse the ISO 8601 formatted string with offset to OffsetDateTime
+        OffsetDateTime offsetDateTime = OffsetDateTime.parse(dateTimeString, DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+        
+        // Convert to LocalDateTime (removes timezone/offset information)
+        return offsetDateTime.toLocalDateTime();
+    }
+
 
 
     /**
