@@ -127,7 +127,6 @@ public class UpdateEventNode extends GoogleCalendarNode {
 
             Event event = EventConverter.toGoogleCalendarEvent(eventRequest);
             System.out.println("Sending event: " +
-             "id: " + event.getId() + "\n" +
              "summary: " + event.getSummary() + "\n" +
              "start: " + event.getStart() + "\n" +
              "end: " + event.getEnd() + "\n"

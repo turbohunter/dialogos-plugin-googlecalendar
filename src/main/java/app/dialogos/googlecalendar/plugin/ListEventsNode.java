@@ -7,6 +7,10 @@ import com.clt.diamant.graph.nodes.NodeExecutionException;
 import com.clt.diamant.gui.NodePropertiesDialog;
 import com.clt.xml.XMLReader;
 import com.clt.xml.XMLWriter;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+
 import org.xml.sax.SAXException;
 import com.clt.diamant.WozInterface;
 import com.clt.diamant.InputCenter;
@@ -18,9 +22,11 @@ import com.google.api.services.calendar.model.Events;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.HashMap;
 import javax.swing.*;
 import java.awt.*;
 
@@ -146,8 +152,8 @@ public class ListEventsNode extends GoogleCalendarNode {
                     throw new NodeExecutionException(this, "Unknown list mode: " + listMode);
             }
 
-            // Format events as string for output
-            String formattedEvents = formatEventsList(events);
+            // Format events for output
+            String formattedEvents = formatEventsAsJson(events, maxResults);
             setStringVariable(resultVariable, formattedEvents);
             System.out.println("formatted events: " + formattedEvents);
             System.out.println("Events stored in variable: " + resultVariable);
@@ -262,6 +268,76 @@ public class ListEventsNode extends GoogleCalendarNode {
         }
 
         return result.toString();
+    }
+
+    private String formatEventsAsJson(List<Event> events, int displayCount) {
+        int startIndex = 0;
+
+        // Configure ObjectMapper with JavaTimeModule for LocalDateTime support
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
+        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        Map<String, Object> response = new HashMap<>();
+        
+        if (events == null || events.isEmpty()) {
+            Map<String, Object> metadata = new HashMap<>();
+            metadata.put("total_count", 0);
+            metadata.put("displayed_count", 0);
+            metadata.put("start_index", 0);
+            metadata.put("has_more", false);
+            response.put("metadata", metadata);
+            response.put("events", new ArrayList<>());
+            
+            try {
+                return mapper.writeValueAsString(response);
+            } catch (Exception e) {
+                return "{\"error\":\"No events found\"}";
+            }
+        }
+
+        // metadata for pagination
+        Map<String, Object> metadata = new HashMap<>();
+        metadata.put("total_count", events.size());
+        metadata.put("displayed_count", Math.min(displayCount, events.size()));
+        metadata.put("start_index", startIndex);
+        metadata.put("has_more", (startIndex + displayCount) < events.size());
+        
+        response.put("metadata", metadata);
+        
+        // events with structured data
+        List<Map<String, Object>> eventsList = new ArrayList<>();
+        for (int i = startIndex; i < Math.min(startIndex + displayCount, events.size()); i++) {
+            Event event = events.get(i);
+            Map<String, Object> eventMap = new HashMap<>();
+            
+            LocalDateTime startTime = parseJsonToLocalDateTime(event.getStart().toString());
+            LocalDateTime endTime = parseJsonToLocalDateTime(event.getEnd().toString());
+
+            eventMap.put("index", i + 1);
+            eventMap.put("id", event.getId());
+            eventMap.put("summary", event.getSummary() != null ? event.getSummary() : "(No title)");
+            eventMap.put("start", startTime);
+            eventMap.put("end", endTime);
+            eventMap.put("duration_minutes", calculateDuration(startTime, endTime));
+            eventMap.put("location", event.getLocation());
+            eventMap.put("description", event.getDescription());
+            
+            eventsList.add(eventMap);
+        }
+        
+        response.put("events", eventsList);
+        
+        try {
+            return mapper.writeValueAsString(response);
+        } catch (Exception e) {
+            System.out.println("JSON serialization failed: " + e + " using fallback");
+            return formatEventsList(events); // Fallback
+        }
+    }
+
+    private int calculateDuration(LocalDateTime start, LocalDateTime end) {
+        if (start == null || end == null) return 0;
+        return (int) java.time.temporal.ChronoUnit.MINUTES.between(start, end);
     }
 
     @Override
