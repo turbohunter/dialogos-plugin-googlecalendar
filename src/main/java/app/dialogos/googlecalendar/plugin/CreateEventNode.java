@@ -63,6 +63,8 @@ public class CreateEventNode extends GoogleCalendarNode {
     public Node execute(WozInterface comm, InputCenter input, ExecutionLogger logger) 
             throws NodeExecutionException {
         try {
+            System.out.println("=== CreateEventNode Execute ===");
+            
             // Get property values and evaluate variables
             String summaryInput = evaluateVariable(
                 getProperty(PROP_SUMMARY).toString(), logger, comm);
@@ -117,6 +119,11 @@ public class CreateEventNode extends GoogleCalendarNode {
 
             Event event = EventConverter.toGoogleCalendarEvent(eventRequest);
 
+            System.out.println("Sending event: " +
+             "summary: " + event.getSummary() + "\n" +
+             "start: " + event.getStart() + "\n" +
+             "end: " + event.getEnd() + "\n"
+             );
             CalendarConfig config = getCalendarConfig(comm);
             Calendar service = getCalendarService(comm);
 
