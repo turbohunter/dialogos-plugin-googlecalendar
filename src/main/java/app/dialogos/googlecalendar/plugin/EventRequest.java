@@ -30,18 +30,26 @@ public class EventRequest {
     public static class Builder {
         private final EventRequest request = new EventRequest();
         
+        // Helper method to remove double quotes
+        private String removeQuotes(String input) {
+            if (input == null) {
+                return null;
+            }
+            return input.replaceAll("^\"+|\"+$", "");
+        }
+        
         public Builder summary(String summary) {
-            request.summary = summary;
+            request.summary = removeQuotes(summary);
             return this;
         }
         
         public Builder description(String description) {
-            request.description = description;
+            request.description = removeQuotes(description);
             return this;
         }
         
         public Builder location(String location) {
-            request.location = location;
+            request.location = removeQuotes(location);
             return this;
         }
         
